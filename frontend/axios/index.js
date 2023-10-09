@@ -1,7 +1,7 @@
 // ✨ implement axiosWithAuth
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './App';
+import App from '../components/App';
 import axios from 'axios';
 
 const axiosWithAuth = axios.create({
@@ -29,7 +29,9 @@ axiosWithAuth.get('/articles')
 
     root.render(
       <React.StrictMode>
-        <App axiosWithAuth={axiosWithAuth}/>
+        <Router>
+          <App axiosWithAuth={axiosWithAuth}/>
+        </Router>  
       </React.StrictMode>
     );
   })
