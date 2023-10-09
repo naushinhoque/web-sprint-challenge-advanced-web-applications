@@ -1,24 +1,37 @@
 // ✨ implement axiosWithAuth
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import App from './App';
 import axios from 'axios';
 
 const axiosWithAuth = axios.create({
-    //Set up the base URL for my API
-    baseURL: 'http://localhost:9000/api',
-    //Set headers for every request
-    headers: {
-        'Content-Type': 'application/json'
-    
-    }
-})
+  baseURL: 'http://localhost:9000/api',
+  headers: {
+    Authorization: localStorage.getItem('token'),
+    'Content-Type': 'application/json'
+  }
+});
 
-axiosWithAuth.interceptors.request.use((config) => {
-    //get token from localSTorage
-    const token = localStorage.getItem('token');
-    //If token exists, add it to the request headers
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-})
+const root = createRoot(document.getElementById('root'));
 
-export default axiosWithAuth;
+axiosWithAuth.get('/articles')
+  .then(response => {
+    console.log('Authenticated GET arequest response',response.data)
+
+    root.render(
+      <React.StrictMode>
+        <App axiosWithAuth={axiosWithAuth}/>
+      </React.StrictMode>
+    );
+  })
+  .catch(error => {
+    console.error('Authenticated GET request error', error);
+
+    root.render(
+      <React.StrictMode>
+        <App axiosWithAuth={axiosWithAuth}/>
+      </React.StrictMode>
+    );
+  })
+
+  export default axiosWithAuth;

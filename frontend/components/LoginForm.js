@@ -6,6 +6,7 @@ const initialFormValues = {
   password: '',
 }
 export default function LoginForm(props) {
+  const { login, setMessage } = props;
   const [values, setValues] = useState(initialFormValues)
   // ✨ where are my props? Destructure them here
 
@@ -14,9 +15,15 @@ export default function LoginForm(props) {
     setValues({ ...values, [id]: value })
   }
 
-  const onSubmit = evt => {
+  const onSubmit = async (evt) => {
     evt.preventDefault()
     // ✨ implement
+    try {
+      await login(values);
+      setMessage('');
+    } catch (error) {
+      setMessage('Login failed. Please check you credentials.')
+    }
   }
 
   const isDisabled = () => {
@@ -24,6 +31,12 @@ export default function LoginForm(props) {
     // Trimmed username must be >= 3, and
     // trimmed password must be >= 8 for
     // the button to become enabled
+    // Check if the trimmed username has at least 3 characters
+  const isUsernameValid = values.username.trim().length >= 3;
+  // Check if the trimmed password has at least 8 characters
+  const isPasswordValid = values.password.trim().length >= 8;
+  // The button should be disabled if either username or password is invalid
+  return !isUsernameValid || !isPasswordValid;
   }
 
   return (
