@@ -114,7 +114,11 @@ export default function App() {
           <Route path="/" element={<LoginForm login={login} setMessage={setMessage}/>} />
           <Route path="articles" element={
             <>
-              <ArticleForm />
+              <ArticleForm 
+              postArticle={postArticle}
+              updateArticle={updateArticle}
+              setCurrentArticleId={setCurrentArticleId}
+              />
               <Articles 
               articles={articles}
               getArticles={getArticles}
