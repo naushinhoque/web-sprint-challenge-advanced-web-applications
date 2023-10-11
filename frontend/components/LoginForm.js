@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import PT from 'prop-types'
+import { useNavigate } from 'react-router-dom'
 
 const initialFormValues = {
   username: '',
@@ -9,6 +10,8 @@ export default function LoginForm(props) {
   const { login, setMessage } = props;
   const [values, setValues] = useState(initialFormValues)
   // ✨ where are my props? Destructure them here
+
+  const navigate = useNavigate();
 
   const onChange = evt => {
     const { id, value } = evt.target
@@ -21,6 +24,7 @@ export default function LoginForm(props) {
     try {
       await login(values);
       setMessage('');
+      navigate('/articles');
     } catch (error) {
       setMessage('Login failed. Please check you credentials.')
     }

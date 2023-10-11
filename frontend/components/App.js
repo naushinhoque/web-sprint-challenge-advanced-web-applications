@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { NavLink, Routes, Route, useNavigate } from 'react-router-dom'
+import { NavLink, Routes, Route, useNavigate, Navigate } from 'react-router-dom'
 import Articles from './Articles'
 import LoginForm from './LoginForm'
 import Message from './Message'
 import ArticleForm from './ArticleForm'
 import Spinner from './Spinner'
+
 
 
 const articlesUrl = 'http://localhost:9000/api/articles'
@@ -16,6 +17,7 @@ export default function App() {
   const [articles, setArticles] = useState([])
   const [currentArticleId, setCurrentArticleId] = useState()
   const [spinnerOn, setSpinnerOn] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // ✨ Research `useNavigate` in React Router v.6
   const navigate = useNavigate()
@@ -46,7 +48,8 @@ export default function App() {
       localStorage.setItem('token', token);
 
       setMessage('Login successful!');
-      getArticles();
+      setIsAuthenticated(true); // Set user as authenticated
+      redirectToArticles();
     } catch (error) {
       setMessage('Login failed. Please check your credentials.');
     } finally {
@@ -57,30 +60,69 @@ export default function App() {
     // to the Articles screen. Don't forget to turn off the spinner!
   }
 
+  // const getArticles = async () => {
+  //   // ✨ implement
+  //   // We should flush the message state, turn on the spinner
+  //   setMessage('');
+  //   setSpinnerOn(true);
+  //   // and launch an authenticated request to the proper endpoint.
+  //   try {
+  //     const response = await axiosWithAuth.get(articlesUrl);
+  //     setArticles(response.data);
+  //   } catch (error) {
+  //     if (error.response && error.response.status === 401) {
+  //       logout();
+  //     } else {
+  //       setMessage('Error fetching articles');
+  //     }
+  //   } finally {
+  //     setSpinnerOn(false);
+  //   }
+  //   // On success, we should set the articles in their proper state and
+  //   // put the server success message in its proper state.
+  //   // If something goes wrong, check the status of the response:
+  //   // if it's a 401 the token might have gone bad, and we should redirect to login.
+  //   // Don't forget to turn off the spinner!
+  // }
   const getArticles = async () => {
-    // ✨ implement
-    // We should flush the message state, turn on the spinner
     setMessage('');
     setSpinnerOn(true);
-    // and launch an authenticated request to the proper endpoint.
+
     try {
-      const response = await axiosWithAuth.get(articlesUrl);
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        setMessage('No token found. Please log in.');
+        setSpinnerOn(false);
+        return;
+      }
+
+      // Include the token in the request headers
+      const response = await axios.get('http://localhost:9000/api/articles', {
+        headers: {
+          Authorization: token,
+        },
+      });
+
       setArticles(response.data);
+      setMessage('Articles fetched successfully');
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        logout();
+        setMessage('Session has expired. Please log in again.');
+        return <navigate to="/login" />;
       } else {
         setMessage('Error fetching articles');
       }
     } finally {
       setSpinnerOn(false);
     }
-    // On success, we should set the articles in their proper state and
-    // put the server success message in its proper state.
-    // If something goes wrong, check the status of the response:
-    // if it's a 401 the token might have gone bad, and we should redirect to login.
-    // Don't forget to turn off the spinner!
-  }
+  };
+
+  // useEffect(() => {
+  //   if (localStorage.getItem('token')) {
+      
+  //   }
+  // }, []);
 
   const postArticle = article => {
     // ✨ implement
@@ -113,7 +155,9 @@ export default function App() {
         <Routes>
           <Route path="/" element={<LoginForm login={login} setMessage={setMessage}/>} />
           <Route path="articles" element={
+            isAuthenticated ? (
             <>
+            
               <ArticleForm 
               postArticle={postArticle}
               updateArticle={updateArticle}
@@ -128,7 +172,11 @@ export default function App() {
               successMessage={message}
               />
             </>
-          } />
+            ) : (
+              <Navigate to="/" />
+            )
+          } 
+          />
         </Routes>
         <footer>Bloom Institute of Technology 2022</footer>
       </div>
