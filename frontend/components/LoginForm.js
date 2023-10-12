@@ -21,13 +21,18 @@ export default function LoginForm(props) {
   const onSubmit = async (evt) => {
     evt.preventDefault()
     // ✨ implement
-    try {
-      await login(values);
-      setMessage('');
-      navigate('/articles');
-    } catch (error) {
-      setMessage('Login failed. Please check you credentials.')
-    }
+    if (isDisabled()) {
+      
+      return;
+    } 
+      const success = await login(values.username, values.password);
+      console.log(values.username, values.password);
+
+      if (success) {
+        navigate('/articles');
+      } else {
+        setMessage('Login failed. Please check your credentials.')
+      }
   }
 
   const isDisabled = () => {

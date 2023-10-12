@@ -5,6 +5,7 @@ import LoginForm from './LoginForm'
 import Message from './Message'
 import ArticleForm from './ArticleForm'
 import Spinner from './Spinner'
+import axiosWithAuth from '../axios/index'
 
 
 
@@ -21,8 +22,8 @@ export default function App() {
 
   // ✨ Research `useNavigate` in React Router v.6
   const navigate = useNavigate()
-  const redirectToLogin = () => { navigate('/') }
-  const redirectToArticles = () => { navigate('/articles') }
+  const redirectToLogin = () =>  navigate('/') 
+  const redirectToArticles = () =>  navigate('/articles') 
 
   const logout = () => {
     // ✨ implement
@@ -35,15 +36,19 @@ export default function App() {
     redirectToLogin();
   }
 
-  const login = async ({ username, password }) => {
+  const login = async ( username, password ) => {
     // ✨ implement
     // We should flush the message state, turn on the spinner
     setMessage('');
     setSpinnerOn(true);
+    console.log(username, password);
+
     // and launch a request to the proper endpoint.
     try {
-      const response = await axiosWithAuth.post(loginUrl, { username, password });
+      const response = await axiosWithAuth().post(loginUrl, { username, password });
       const { token } = response.data;
+      
+      console.log(token);
 
       localStorage.setItem('token', token);
 
@@ -51,6 +56,7 @@ export default function App() {
       setIsAuthenticated(true); // Set user as authenticated
       redirectToArticles();
     } catch (error) {
+      console.log(error);
       setMessage('Login failed. Please check your credentials.');
     } finally {
       setSpinnerOn(false);
@@ -98,15 +104,13 @@ export default function App() {
       }
 
       // Include the token in the request headers
-      const response = await axios.get('http://localhost:9000/api/articles', {
-        headers: {
-          Authorization: token,
-        },
-      });
+      const response = await axiosWithAuth().get('http://localhost:9000/api/articles');
+      
 
       setArticles(response.data);
       setMessage('Articles fetched successfully');
     } catch (error) {
+      console.log(error);
       if (error.response && error.response.status === 401) {
         setMessage('Session has expired. Please log in again.');
         return <navigate to="/login" />;
