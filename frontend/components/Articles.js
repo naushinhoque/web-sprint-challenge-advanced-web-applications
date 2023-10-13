@@ -7,33 +7,29 @@ export default function Articles(props) {
   // ✨ where are my props? Destructure them here
  
   const { articles, getArticles, deleteArticle, setCurrentArticleId, currentArticleId, successMessage } = props;
-  // const [articles, setArticles] = useState([]);
-  // ✨ implement conditional logic: if no token exists
-  // we should render a Navigate to login screen (React Router v.6)
   console.log(articles);
 
-  console.log(articles);
+
   useEffect(() => {
-    // ✨ grab the articles here, on first render only
     if (!localStorage.getItem('token')) {
-     
+      return;
     } else {
-      const fetchArticles = async () => {
-        try {
-          const response = await axiosWithAuth().get('/articles');
-          setArticles(response.data);
-        } catch (error) {
-          if (error.response && error.response.status === 401) {
-            localStorage.removeItem('token');
-            return <Navigate to="/" />;
-          }
-        }
-      };
+      const fetchArticles = () => {
+        axiosWithAuth()
+          .get('/articles')
+          .then(res => {
+            getArticles(res.data);
+          })
+          .catch(err => {
+            if (err.response && err.response.status === 401 ) {
+              localStorage.removeItem('token');
+              <Navigate to="/" />
+            }
+          })
+      }
       fetchArticles();
     }
-  // // If there is no token, the component will return null (no rendering)
-  
-  }, [])
+  }, []);
 
   return (
     <div className="articles">

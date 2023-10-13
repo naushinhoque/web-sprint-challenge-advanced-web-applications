@@ -36,35 +36,57 @@ export default function App() {
     redirectToLogin();
   }
 
-  const login = async ( username, password ) => {
-    // ✨ implement
-    // We should flush the message state, turn on the spinner
-    setMessage('');
+  const login = (username, password) => {
     setSpinnerOn(true);
-    console.log(username, password);
+    setMessage('');
+    axiosWithAuth()
+      .post(loginUrl, { username, password })
+      .then(res => {
+        const { token } = res.data;
 
-    // and launch a request to the proper endpoint.
-    try {
-      const response = await axiosWithAuth().post(loginUrl, { username, password });
-      const { token } = response.data;
-      
-      console.log(token);
+        localStorage.setItem('token', token);
 
-      localStorage.setItem('token', token);
-
-      setMessage('Login successful!');
-      setIsAuthenticated(true); // Set user as authenticated
-      redirectToArticles();
-    } catch (error) {
-      console.log(error);
-      setMessage('Login failed. Please check your credentials.');
-    } finally {
-      setSpinnerOn(false);
-    };
-    // On success, we should set the token to local storage in a 'token' key,
-    // put the server success message in its proper state, and redirect
-    // to the Articles screen. Don't forget to turn off the spinner!
+        setMessage(res.data.message)
+        setIsAuthenticated(true);
+        redirectToArticles();
+      })
+      .catch(err => {
+        setMessage(err.data.message)
+      })
+      .finally(() => {
+        setSpinnerOn(false);
+      })
   }
+
+  // const login = async ( username, password ) => {
+  //   // ✨ implement
+  //   // We should flush the message state, turn on the spinner
+  //   setMessage('');
+  //   setSpinnerOn(true);
+  //   console.log(username, password);
+
+  //   // and launch a request to the proper endpoint.
+  //   try {
+  //     const response = await axiosWithAuth().post(loginUrl, { username, password });
+  //     const { token } = response.data;
+      
+  //     console.log(token);
+
+  //     localStorage.setItem('token', token);
+
+  //     setMessage('Login successful!');
+  //     setIsAuthenticated(true); // Set user as authenticated
+  //     redirectToArticles();
+  //   } catch (error) {
+  //     console.log(error);
+  //     setMessage('Login failed. Please check your credentials.');
+  //   } finally {
+  //     setSpinnerOn(false);
+  //   };
+  //   // On success, we should set the token to local storage in a 'token' key,
+  //   // put the server success message in its proper state, and redirect
+  //   // to the Articles screen. Don't forget to turn off the spinner!
+  // }
 
   // const getArticles = async () => {
   //   // ✨ implement
@@ -90,58 +112,94 @@ export default function App() {
   //   // if it's a 401 the token might have gone bad, and we should redirect to login.
   //   // Don't forget to turn off the spinner!
   // }
-  const getArticles = async () => {
-    setMessage('');
+  const getArticles = () => {
     setSpinnerOn(true);
-
-    try {
-      const token = localStorage.getItem('token');
-
-      if (!token) {
-        setMessage('No token found. Please log in.');
-        setSpinnerOn(false);
-        return;
-      }
-
-      // Include the token in the request headers
-      const response = await axiosWithAuth().get('http://localhost:9000/api/articles');
-      
-
-      setArticles(response.data);
-      setMessage('Articles fetched successfully');
-    } catch (error) {
-      console.log(error);
-      if (error.response && error.response.status === 401) {
-        setMessage('Session has expired. Please log in again.');
-        return <navigate to="/login" />;
-      } else {
-        setMessage('Error fetching articles');
-      }
-    } finally {
-      setSpinnerOn(false);
-    }
+    setMessage('');
+    axios().get(articlesUrl)
+      .then(res => {
+        setMessage(res.data.message)
+        setArticles(res.data.articles)
+      })
+      .catch(err => {
+        setMessage(err?.response?.data?.message || 'Something bad happened')
+        if (err.response.status === 401) {
+          redirectToLogin()
+        }
+      })
+      .finally(() => {
+        setSpinnerOn(false)
+      })
   };
 
-  // useEffect(() => {
-  //   if (localStorage.getItem('token')) {
-      
-  //   }
-  // }, []);
 
   const postArticle = article => {
     // ✨ implement
     // The flow is very similar to the `getArticles` function.
     // You'll know what to do! Use log statements or breakpoints
     // to inspect the response from the server.
+    setSpinnerOn(true);
+    setMessage('');
+    axios()
+      .post(articlesUrl, article)
+      .then(res => {
+        setMessage(res.data.message)
+      })
+      .catch((error) => {
+        setMessage(error?.response?.data?.message || 'Error posting article');
+        if (error.response.status === 401) {
+          // Handle unauthorized error if needed
+          redirectToLogin();
+        }
+      })
+      .finally(() => {
+        setSpinnerOn(false);
+      });
   }
 
   const updateArticle = ({ article_id, article }) => {
     // ✨ implement
     // You got this!
+  setSpinnerOn(true);
+  setMessage('');
+
+  axios()
+    .put(`${articlesUrl}/${article_id}`, article)
+    .then((response) => {
+      // Assuming the response contains a success message or updated article data
+      setMessage(response.data.message || 'Article updated successfully');
+      // If you need to do something with the updated article data, you can use it here
+    })
+    .catch((error) => {
+      setMessage(error?.response?.data?.message || 'Error updating article');
+      if (error.response.status === 401) {
+        // Handle unauthorized error if needed
+        redirectToLogin();
+      }
+    })
+    .finally(() => {
+      setSpinnerOn(false);
+    });
   }
 
   const deleteArticle = article_id => {
-    // ✨ implement
+    // ✨ implement\
+    axios()
+    .delete(`${articlesUrl}/${article_id}`)
+    .then((response) => {
+      // Assuming the response contains a success message
+      setMessage(response.data.message || 'Article deleted successfully');
+      // If you need to perform additional actions upon successful deletion, you can do it here
+    })
+    .catch((error) => {
+      setMessage(error?.response?.data?.message || 'Error deleting article');
+      if (error.response.status === 401) {
+        // Handle unauthorized error if needed
+        redirectToLogin();
+      }
+    })
+    .finally(() => {
+      setSpinnerOn(false);
+    });
   }
 
   return (
