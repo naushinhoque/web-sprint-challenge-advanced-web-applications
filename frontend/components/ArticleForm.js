@@ -6,7 +6,7 @@ const initialFormValues = { title: '', text: '', topic: '' }
 export default function ArticleForm(props) {
   const [values, setValues] = useState(initialFormValues)
   // ✨ where are my props? Destructure them here
-  const { postArticle, updateArticle, setCurrentArticleId, currentArticle, currentArticleId } = props; 
+  const { postArticle, updateArticle, setCurrentArticleId, currentArticle, setCurrentArticle, currentArticleId } = props; 
 
   useEffect(() => {
     // ✨ implement
@@ -22,7 +22,7 @@ export default function ArticleForm(props) {
     } else {
       setValues(initialFormValues);
     }
-  }, [currentArticle])
+  }, [])
 
   const onChange = evt => {
     const { id, value } = evt.target
@@ -40,7 +40,7 @@ export default function ArticleForm(props) {
       postArticle(values);
     }
     setValues(initialFormValues);
-    setCurrentArticleId(null);
+    setCurrentArticle(null);
   }
 
   const isDisabled = () => {
@@ -75,7 +75,7 @@ export default function ArticleForm(props) {
         <option value="Node">Node</option>
       </select>
       <div className="button-group">
-        <button disabled={isDisabled()} id="submitArticle">Submit</button>
+        <button onClick={() => postArticle()} disabled={isDisabled()} id="submitArticle">Submit</button>
         <button onClick={() => setCurrentArticleId(null)}>Cancel edit</button>
       </div>
     </form>
