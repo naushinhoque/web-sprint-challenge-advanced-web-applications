@@ -6,7 +6,7 @@ import axiosWithAuth from '../axios/index';
 export default function Articles(props) {
   // ✨ where are my props? Destructure them here
  
-  const { articles, getArticles, deleteArticle, setCurrentArticleId, currentArticleId, successMessage } = props;
+  const { articles, getArticles, deleteArticle, setCurrentArticleId, successMessage } = props;
   // console.log(articles);
 
 

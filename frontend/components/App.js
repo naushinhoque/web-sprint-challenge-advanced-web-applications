@@ -45,7 +45,7 @@ export default function App() {
       .then(res => {
         const { token } = res.data;
 
-        localStorage.setItem('token', token);
+        window.localStorage.setItem('token', token);
 
         setMessage(res.data.message)
         setIsAuthenticated(true);
@@ -69,7 +69,7 @@ export default function App() {
         setArticles(res.data.articles)
       })
       .catch(err => {
-        setMessage(err?.response?.data?.message || 'Something bad happened')
+        setMessage(err?.response?.data?.message)
         if (err.response.status === 401) {
           redirectToLogin()
         }
@@ -90,10 +90,10 @@ export default function App() {
       .post(articlesUrl, article)
       .then(res => {
         setMessage(res.data.message)
-        setArticles(prevArticles => [...prevArticles, res.data.article]);
+        articles.concat(res.data.article)
       })
       .catch((error) => {
-        setMessage(error?.response?.data?.message || 'Error posting article');
+        setMessage(error?.response?.data?.message);
         if (error.response.status === 401) {
           redirectToLogin();
         }
@@ -102,23 +102,18 @@ export default function App() {
   }
 
   const updateArticle = ({ article_id, article }) => {
-  return 
-    (axiosWithAuth()
+    setSpinnerOn(true);
+    setMessage('');
+    axios()
     .put(`${articlesUrl}/${article_id}`, article)
     .then((response) => {
       console.log(response.data.articles)
       setMessage(response.data.message );
-      // setArticles(articles.map((article) => {
-      //   if (article.id = response.data.article) {
-      //     return response.data.articles
-      //   }
-      // }));
-      // setArticles(articles.id);
-      setArticles((prevArticles) =>
-      prevArticles.map((prevArticle) =>
-        prevArticle.id === article_id ? response.data.article : prevArticle
-      )
-    )
+      setArticles(articles => {
+        return articles.map(art => {
+          return art.article_id ===article_id ? response.data.article : art
+        })
+      })
     })
     .catch((error) => {
       setMessage(error?.response?.data?.message || 'Error updating article');
@@ -126,18 +121,21 @@ export default function App() {
         redirectToLogin();
       }
     })
-    )
+    .finally(() => {
+      setSpinnerOn(false)
+    })
   }
 
   const deleteArticle = article_id => {
-
+    setSpinnerOn(true);
+    setMessage('');
     axiosWithAuth() 
-    .delete(`/articles/${article_id}`)
+    .delete(`${articlesUrl}/${article_id}`)
     .then((response) => {
-      setMessage(response.data.message || 'Article deleted successfully');
+      setMessage(response.data.message);
       // setArticles(articles.id)
-      setArticles((prevArticles) =>
-        prevArticles.filter((prevArticle) => prevArticle.id !== article_id)
+      setArticles(articles =>
+        articles.filter((article) => article.article_id !== article_id)
       );
     })
     .catch((error) => {
@@ -146,6 +144,9 @@ export default function App() {
         // Handle unauthorized error if needed
         redirectToLogin();
       }
+    })
+    .finally(() => {
+      setSpinnerOn(false)
     })
   }
 
