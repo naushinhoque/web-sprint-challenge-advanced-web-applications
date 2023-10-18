@@ -45,10 +45,10 @@ export default function App() {
       .then(res => {
         const { token } = res.data;
 
-        window.localStorage.setItem('token', token);
+        localStorage.setItem('token', token);
 
         setMessage(res.data.message)
-        setIsAuthenticated(true);
+        // setIsAuthenticated(true);
         redirectToArticles();
       })
       .catch(err => {
@@ -102,18 +102,19 @@ export default function App() {
   }
 
   const updateArticle = ({ article_id, article }) => {
+    console.log('start')
     setSpinnerOn(true);
     setMessage('');
-    axios()
+    axiosWithAuth()
     .put(`${articlesUrl}/${article_id}`, article)
     .then((response) => {
-      console.log(response.data.articles)
+      console.log('update:',response.data.articles)
       setMessage(response.data.message );
-      setArticles(articles => {
-        return articles.map(art => {
-          return art.article_id ===article_id ? response.data.article : art
-        })
-      })
+      // setArticles(articles => {
+      //   return articles.map(art => {
+      //     return art.article_id ===article_id ? response.data.article : art
+      //   })
+      // })
     })
     .catch((error) => {
       setMessage(error?.response?.data?.message || 'Error updating article');
@@ -165,10 +166,11 @@ export default function App() {
         <Routes>
           <Route path="/" element={<LoginForm login={login} setMessage={setMessage}/>} />
           <Route path="articles" element={
-            isAuthenticated ? (
+            // isAuthenticated ? (
             <>
             
               <ArticleForm 
+              articles={articles}
               postArticle={postArticle}
               updateArticle={updateArticle}
               setCurrentArticleId={setCurrentArticleId}
@@ -185,9 +187,9 @@ export default function App() {
               successMessage={message}
               />
             </>
-            ) : (
-              <Navigate to="/" />
-            )
+            // ) : (
+              // <Navigate to="/" />
+            // )
           } 
           />
         </Routes>
