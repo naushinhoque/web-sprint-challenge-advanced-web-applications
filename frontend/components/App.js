@@ -27,13 +27,8 @@ export default function App() {
   const redirectToArticles = () =>  navigate('/articles') 
 
   const logout = () => {
-    // ✨ implement
-    // If a token is in local storage it should be removed,
     localStorage.removeItem('token');
-    // and a message saying "Goodbye!" should be set in its proper state.
     setMessage('Goodbye!')
-    // In any case, we should redirect the browser back to the login screen,
-    // using the helper above.
     redirectToLogin();
   }
 
@@ -110,11 +105,11 @@ export default function App() {
     .then((response) => {
       console.log('update:',response.data.articles)
       setMessage(response.data.message );
-      // setArticles(articles => {
-      //   return articles.map(art => {
-      //     return art.article_id ===article_id ? response.data.article : art
-      //   })
-      // })
+      setArticles(articles => {
+        return articles.map(art => {
+          return art.article_id ===article_id ? response.data.article : art
+        })
+      })
     })
     .catch((error) => {
       setMessage(error?.response?.data?.message || 'Error updating article');
@@ -175,7 +170,7 @@ export default function App() {
               updateArticle={updateArticle}
               setCurrentArticleId={setCurrentArticleId}
               currentArticleId={currentArticleId}
-              currentArticle={currentArticle}
+              currentArticle={currentArticleId ? articles.find(article => article.article_id === currentArticleId) : null }
               setCurrentArticle={setCurrentArticle}
               />
               <Articles 

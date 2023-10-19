@@ -14,34 +14,38 @@ export default function ArticleForm(props) {
     // if it's truthy, we should set its title, text and topic into the corresponding
     // values of the form. If it's not, we should reset the form back to initial values.
     if (currentArticleId) {
-      // setValues({
-      //   title: currentArticle.title,
-      //   text: currentArticle.text,
-      //   topic: currentArticle.topic
-      // });
+      setValues({
+        title: currentArticle.title,
+        text: currentArticle.text,
+        topic: currentArticle.topic
+      });
       console.log('currentArticleId')
     } else {
       setValues(initialFormValues);
     }
-  }, [])
+  }, [currentArticle])
 
   const onChange = evt => {
     const { id, value } = evt.target
     setValues({ ...values, [id]: value })
   }
 
+
   const onSubmit = async (evt) => {
     evt.preventDefault()
     // ✨ implement
     // We must submit a new post or update an existing one,
     // depending on the truthyness of the `currentArticle` prop.
-    if (currentArticleId) {
-      updateArticle({ article_id: currentArticleId, article: values });
-    } else {
-      postArticle(values);
+    const article = {
+      title: values.title,
+      text: values.text,
+      topic: values.topic,
     }
-    setValues(initialFormValues);
-    setCurrentArticle(null);
+    currentArticle
+      ? updateArticle({ article, article_id: currentArticle.article_id})
+      : postArticle(article)
+    setCurrentArticleId()
+    setValues(initialFormValues)
   }
 
   const isDisabled = () => {
@@ -77,7 +81,8 @@ export default function ArticleForm(props) {
       </select>
       <div className="button-group">
         <button disabled={isDisabled()} id="submitArticle">Submit</button>
-        <button onClick={() => setCurrentArticleId(null)}>Cancel edit</button>
+        <button onClick={(evt) => {evt.preventDefault()
+          setCurrentArticleId(null)}}>Cancel edit</button>
       </div>
     </form>
   )

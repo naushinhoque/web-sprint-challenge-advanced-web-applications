@@ -4,7 +4,6 @@ import PT from 'prop-types'
 import axiosWithAuth from '../axios/index';
 
 export default function Articles(props) {
-  // ✨ where are my props? Destructure them here
 
   const { articles, getArticles, deleteArticle, currentArticleId, setCurrentArticleId, successMessage } = props;
   // console.log(articles);
@@ -25,7 +24,6 @@ export default function Articles(props) {
   //   console.log(articles);
   // }
 
-  console.log(articles);
   return (
     <div className="articles">
       <h2>Articles</h2>
@@ -40,8 +38,8 @@ export default function Articles(props) {
               <p>Topic: {art.topic}</p>
             </div>
             <div>
-              <button onClick={() => { setCurrentArticleId(art.article_id) }}>Edit</button>
-              <button onClick={() => deleteArticle(art.article_id)}>Delete</button>
+              <button disabled={!!currentArticleId} onClick={() => setCurrentArticleId(art.article_id)}>Edit</button>
+              <button disabled={!!currentArticleId} onClick={() => deleteArticle(art.article_id)}>Delete</button>
             </div>
           </div>
         ))
@@ -50,32 +48,7 @@ export default function Articles(props) {
     </div>
   );
 }
-//   const articlesExist = Array.isArray(articles) && articles.length > 0;
 
-//   return (
-//     <div className="articles">
-//       <h2>Articles</h2>
-//       {articlesExist ? (
-//         articles.map((art) => (
-//           <div className="article" key={art.article_id}>
-//             <div>
-//               <h3>{art.title}</h3>
-//               <p>{art.text}</p>
-//               <p>Topic: {art.topic}</p>
-//             </div>
-//             <div>
-//               <button onClick={() => { setCurrentArticleId(art.article_id) }}>Edit</button>
-//               <button onClick={() => deleteArticle(art.article_id)}>Delete</button>
-//             </div>
-//           </div>
-//         ))
-//       ) : (
-//         'No articles yet'
-//       )}
-//       {successMessage && <p>{successMessage}</p>}
-//     </div>
-//   );
-// }
 
 // 🔥 No touchy: Articles expects the following props exactly:
 Articles.propTypes = {
