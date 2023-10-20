@@ -28,11 +28,11 @@ export default function LoginForm(props) {
       const success = await login(values.username, values.password);
       console.log(values.username, values.password);
 
-      if (success) {
-        navigate('/articles');
-      } else {
-        setMessage('Login failed. Please check your credentials.')
-      }
+      // if (success) {
+      //   navigate('/articles');
+      // } else {
+      //   setMessage('Login failed. Please check your credentials.')
+      // }
   }
 
   const isDisabled = () => {
