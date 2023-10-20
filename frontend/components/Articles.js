@@ -5,7 +5,7 @@ import axiosWithAuth from '../axios/index';
 
 export default function Articles(props) {
 
-  const { articles, getArticles, deleteArticle, currentArticleId, setCurrentArticleId, successMessage } = props;
+  const { articles, getArticles, deleteArticle, currentArticleId, setCurrentArticleId } = props;
   // console.log(articles);
   const token = localStorage.getItem('token')
   const navigate = useNavigate()
@@ -19,10 +19,6 @@ export default function Articles(props) {
     console.log("Fetching articles...");
   }, []);
 
-  // const editArticle = (art) => {
-  //   setCurrentArticleId(art.article_id)
-  //   console.log(articles);
-  // }
 
   return (
     <div className="articles">
@@ -44,11 +40,10 @@ export default function Articles(props) {
           </div>
         ))
       )}
-      {successMessage && <p>{successMessage}</p>}
     </div>
   );
 }
-
+// && <p>{succMessage}</p>ess
 
 // 🔥 No touchy: Articles expects the following props exactly:
 Articles.propTypes = {

@@ -42,9 +42,7 @@ export default function LoginForm(props) {
     // the button to become enabled
     // Check if the trimmed username has at least 3 characters
   const isUsernameValid = values.username.trim().length >= 3;
-  // Check if the trimmed password has at least 8 characters
   const isPasswordValid = values.password.trim().length >= 8;
-  // The button should be disabled if either username or password is invalid
   return !isUsernameValid || !isPasswordValid;
   }
 
