@@ -80,12 +80,11 @@ export default function App() {
     // The flow is very similar to the `getArticles` function.
     // You'll know what to do! Use log statements or breakpoints
     // to inspect the response from the server.
-    return (
     axiosWithAuth()
       .post(articlesUrl, article)
       .then(res => {
         setMessage(res.data.message)
-        articles.concat(res.data.article)
+        setArticles(articles.concat(res.data.article))
       })
       .catch((error) => {
         setMessage(error?.response?.data?.message);
@@ -93,7 +92,6 @@ export default function App() {
           redirectToLogin();
         }
       })
-    )
   }
 
   const updateArticle = ({ article_id, article }) => {
